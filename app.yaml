@@ -1,0 +1,23 @@
+runtime: nodejs16  # Node.js runtime
+
+env_variables:
+  NODE_ENV: production
+
+# handlers:
+# - url: /api/.*  # Define URL paths for your API
+#   script: auto  # Use the Node.js runtime to handle API requests
+
+# - url: /.*
+#   static_files: todo-list-app/src/index.html  # Serve the Angular app's entry point
+#   upload: todo-list-app/src/index.html
+
+handlers:
+  - url: /
+    static_files: dist/todo-list-app/index.html
+    upload: dist/todo-list-app/index.html
+    
+    
+
+   
+
+
