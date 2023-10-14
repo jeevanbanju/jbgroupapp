@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GCP_PROJECT_ID = 'jenkins-poc-400711'
+        GCP_PROJECT_ID = 'inspiring-dryad-400607'
         GAR_REGION = 'asia-south1'
         APP_IMAGE_NAME = 'todo-app'
         K8S_NAMESPACE = 'default'
@@ -35,7 +35,7 @@ pipeline {
                         gcloud auth activate-service-account --key-file=${GC_KEY}
                         docker tag todo-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
                         gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev
-                        docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
+                        docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/mohan/${APP_IMAGE_NAME}:${env.BUILD_ID}
                     """
                 }
             }
