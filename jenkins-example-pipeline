@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         GCP_PROJECT_ID = 'jenkins-poc-400711'
-        GAR_REGION = 'us-east1'
+        GAR_REGION = 'asia-south1'
         APP_IMAGE_NAME = 'todo-app'
         K8S_NAMESPACE = 'default'
     }
