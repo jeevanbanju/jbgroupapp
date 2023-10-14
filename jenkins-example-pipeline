@@ -45,7 +45,7 @@ pipeline {
             steps {
                 script {
                     // Authenticate with Google Cloud using a service account key
-                    withCredentials([file(credentialsId: 'inspiring-dryad-400607', variable: 'GC_KEY')]) {
+                    withCredentials([file(credentialsId: 'jenkins-poc-400711', variable: 'GC_KEY')]) {
                         sh """
                             gcloud auth activate-service-account --key-file=${GC_KEY}
                             gcloud config set project ${GCP_PROJECT_ID}
