@@ -2,10 +2,11 @@ pipeline {
     agent any
 
     environment {
-        GCP_PROJECT_ID = 'inspiring-dryad-400607'
-        GAR_REGION = 'asia-south1'
+        GCP_PROJECT_ID = 'jenkins-poc-400711'
+        GAR_REGION = 'us-east1'
         APP_IMAGE_NAME = 'todo-app'
         K8S_NAMESPACE = 'default'
+        GKE_CLUSTER_NAME = 'gke-todo-deploy'
     }
 
     tools {
@@ -33,30 +34,35 @@ pipeline {
                 withCredentials([file(credentialsId: 'jenkins-poc-400711', variable: 'GC_KEY')]) {
                     sh """
                         gcloud auth activate-service-account --key-file=${GC_KEY}
-                        docker tag todo-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/mohan/${APP_IMAGE_NAME}:${env.BUILD_ID}
+                        docker tag todo-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
                         gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev
-                        docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/mohan/${APP_IMAGE_NAME}:${env.BUILD_ID}
+                        docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
                     """
                 }
             }
         }
 
-        stage('Deploy to App Engine') {
-            steps {
-                script {
-                    // Authenticate with Google Cloud using a service account key
-                    withCredentials([file(credentialsId: 'jenkins-poc-400711', variable: 'GC_KEY')]) {
-                        sh """
-                            gcloud auth activate-service-account --key-file=${GC_KEY}
-                            gcloud config set project ${GCP_PROJECT_ID}
-                            gcloud app deploy app.yaml --version ${env.BUILD_ID} --quiet
-                        """
-                    }
-                }
-            }
-        }
-    }
+      stage('Deploy to GKE') {
+                steps {
+                    script {
+                        // Authenticate to GKE cluster
+                        gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-400711', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
 
+                        // Set the Kubectl context to your GKE cluster
+                        sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b"
+
+                        sh "sed -i 's/tagversion/${env.Build_ID}/g' deployment.yaml"
+                        sh "cat deployment.yaml"
+
+                        // Apply the Kubernetes manifest to deploy the application
+                        sh "kubectl apply -f deployment.yaml -n ${K8S_NAMESPACE}"
+                        sh "kubectl apply -f service.yaml -n ${K8S_NAMESPACE}"
+                        cleanWs()
+
+                    }
+                }
+            }
+        }
     post {
         success {
             echo 'Pipeline succeeded!'
@@ -64,7 +70,7 @@ pipeline {
             emailext (
                 subject: 'Pipeline Succeeded',
                 body: 'Your Jenkins pipeline has succeeded!',
-                to: 'cryptojeevan6@gmail.com',
+                to: 'saipreethipottella@gmail.com',
                 attachLog: false
             )
         }
@@ -74,7 +80,7 @@ pipeline {
             emailext (
                 subject: 'Pipeline Failed',
                 body: 'Your Jenkins pipeline has failed. Please look into it!',
-                to: 'cryptojeevan6@gmail.com',
+                to: 'saipreethipottella@gmail.com',
                 attachLog: true
             )
         }
