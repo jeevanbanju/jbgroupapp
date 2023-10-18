@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        GCP_PROJECT_ID = 'jenkins-poc-400711'
-        GAR_REGION = 'us-east1'
+        GCP_PROJECT_ID = 'inspiring-dryad-400607'
+        GAR_REGION = 'asia-south1'
         APP_IMAGE_NAME = 'todo-app'
         K8S_NAMESPACE = 'default'
         GKE_CLUSTER_NAME = 'gke-todo-deploy'
@@ -34,9 +34,9 @@ pipeline {
                 withCredentials([file(credentialsId: 'jenkins-poc-400711', variable: 'GC_KEY')]) {
                     sh """
                         gcloud auth activate-service-account --key-file=${GC_KEY}
-                        docker tag todo-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
+                        docker tag todo-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/mohan/${APP_IMAGE_NAME}:${env.BUILD_ID}
                         gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev
-                        docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
+                        docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/mohan/${APP_IMAGE_NAME}:${env.BUILD_ID}
                     """
                 }
             }
@@ -70,7 +70,7 @@ pipeline {
             emailext (
                 subject: 'Pipeline Succeeded',
                 body: 'Your Jenkins pipeline has succeeded!',
-                to: 'saipreethipottella@gmail.com',
+                to: 'cryptojeevan6@gmail.com',
                 attachLog: false
             )
         }
@@ -80,7 +80,7 @@ pipeline {
             emailext (
                 subject: 'Pipeline Failed',
                 body: 'Your Jenkins pipeline has failed. Please look into it!',
-                to: 'saipreethipottella@gmail.com',
+                to: 'cryptojeevan6@gmail.com',
                 attachLog: true
             )
         }
