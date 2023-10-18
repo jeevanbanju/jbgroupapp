@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Jeevan
+  name: jeevan
   namespace: default
   labels:
     app: todo
